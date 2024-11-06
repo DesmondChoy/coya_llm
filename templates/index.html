@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Own Adventure</title>
+</head>
+<body>
+    <h1>Choose Your Own Adventure</h1>
+    <form id="adventure-form">
+        <label for="story-topic">Choose your adventure:</label>
+        <select id="story-topic" name="story_topic" required>
+            {% for topic in story_topics %}
+            <option value="{{ topic }}">{{ topic }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="learn-topic">What do you want to learn?</label>
+        <select id="learn-topic" name="learn_topic" required>
+            {% for topic in learn_topics %}
+            <option value="{{ topic }}">{{ topic }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Start Adventure</button>
+    </form>
+    
+    <div id="story-container"></div>
+
+    <script>
+        document.getElementById('adventure-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            // Close any existing EventSource
+            if (window.storyEventSource) {
+                window.storyEventSource.close();
+            }
+
+            // Clear previous story
+            const storyContainer = document.getElementById('story-container');
+            storyContainer.textContent = '';
+            
+            // Create URL with form data
+            const params = new URLSearchParams(formData);
+            const eventSource = new EventSource(`/generate_adventure?${params.toString()}`);
+            
+            eventSource.onmessage = function(event) {
+                if (event.data === '[DONE]') {
+                    eventSource.close();
+                    return;
+                }
+                storyContainer.textContent += event.data;
+            };
+
+            eventSource.onerror = function(event) {
+                console.error('EventSource failed:', event);
+                eventSource.close();
+            };
+
+            // Store EventSource reference globally for cleanup
+            window.storyEventSource = eventSource;
+        });
+    </script>
+</body>
+</html>
