@@ -4,6 +4,7 @@ from database import (
     get_topics,
     get_story_elements,
     get_quiz_data,
+    debug_story_and_quiz,
 )
 from story_generator import generate_story
 
@@ -23,6 +24,13 @@ def index():
 def generate_adventure():
     story_topic = request.args.get("story_topic")
     learn_topic = request.args.get("learn_topic")
+
+    print("\n=== Debug Info for Current Adventure ===")
+    print(f"Story Topic: {story_topic}")
+    print(f"Learn Topic: {learn_topic}")
+    debug_story_and_quiz(story_topic)
+    debug_story_and_quiz(learn_topic)
+    print("=== End Debug Info ===\n")
 
     story_elements = get_story_elements(story_topic)
     quiz_data = get_quiz_data(learn_topic)

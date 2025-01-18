@@ -91,5 +91,30 @@ def get_quiz_data(topic):
         return cursor.fetchall()
 
 
+def debug_story_and_quiz(topic):
+    print(f"\n=== Debug Output for Topic: {topic} ===")
+
+    print("\n--- Story Elements ---")
+    story_elements = get_story_elements(topic)
+    for element, description in story_elements:
+        print(f"Element: {element}")
+        print(f"Description: {description}")
+        print("-" * 50)
+
+    print("\n--- Quiz Data ---")
+    quiz_data = get_quiz_data(topic)
+    for question, answer, truth in quiz_data:
+        print(f"Question: {question}")
+        print(f"Answer: {answer}")
+        print(f"Truth: {truth}")
+        print("-" * 50)
+
+
 if __name__ == "__main__":
     check_and_create_database()
+
+    # Debug example - uncomment and modify topic to test
+    story_topics, learn_topics = get_topics()
+    if story_topics:
+        print("\nAvailable Topics:", story_topics)
+        debug_story_and_quiz(story_topics[0])  # Test with first available topic
