@@ -10,6 +10,9 @@ def create_table_and_import_data(cursor, sheet):
     table_name = sheet.title
     headers = [cell.value for cell in sheet[1]]
 
+    print(f"\n=== Importing Data for {table_name} ===")
+    print("Headers:", headers)
+
     # Create table
     columns = ", ".join(f'"{header}" TEXT' for header in headers)
     cursor.execute(f"""
@@ -18,6 +21,11 @@ def create_table_and_import_data(cursor, sheet):
         {columns}
     )
     """)
+
+    # Debug: Print Excel data before import
+    print(f"\nData from Excel sheet {table_name}:")
+    for row in sheet.iter_rows(min_row=2, values_only=True):
+        print(row)
 
     # Import data
     insert_query = f'INSERT INTO "{table_name}" ({", ".join(headers)}) VALUES ({", ".join("?" * len(headers))})'
@@ -79,7 +87,14 @@ def get_story_elements(topic):
         cursor.execute(
             "SELECT Element, Description FROM Story WHERE Topic = ?", (topic,)
         )
-        return cursor.fetchall()
+        results = cursor.fetchall()
+        print("\n=== Raw Database Query Results ===")
+        print(f"Topic: {topic}")
+        print("Results from database:")
+        for row in results:
+            print(f"Element: {row[0]}, Description: {row[1]}")
+        print("=" * 50)
+        return results
 
 
 def get_quiz_data(topic):
